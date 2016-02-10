@@ -1,0 +1,108 @@
+Use the HTML below for the lab. (Just copy and paste it into your editor of choice.)
+
+<html>
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ <style>
+  body {
+   font-family: Verdana;
+  }
+  h1, h2, h3 {
+   color: darkblue;
+  }
+  .rating-circle {
+   height: 2em;
+   width: 2em;
+   border: .1em solid black;
+   border-radius: 1.1em;
+   display: inline-block;
+   margin: 0;
+   padding: .1em;
+  }
+
+  .rating-hover {
+   background-color: yellow;
+  }
+
+  .rating-chosen {
+   background-color: green;
+  }
+ </style>
+</head>
+<body>
+ <h1>Contoso Web Developer Conference</h1>
+ <h2>Finding elements using jQuery</h2>
+ <div>This session is about identifying elements using jQuery methods and selectors.</div>
+ <h3>Rate this session</h3>
+ <div id="rating-container" max-value="5">
+    <div class="rating-circle"></div>
+    <div class="rating-circle"></div>
+    <div class="rating-circle"></div>
+    <div class="rating-circle"></div>
+    <div class="rating-circle"></div>
+ </div>
+
+<div>
+  <label for="max-value">Enter max value:</label>
+  <input type="text" id="max-value" />
+  <button type="button" id="update-max-value">Update max value</button>
+</div>
+<button type="button" id="save-rating">Save rating</button>
+<div id="output"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+ <script>
+        // your answer would go here
+        var value
+          $(document).delegate('.rating-circle','mouseenter',function() {
+          $(this).prevAll().andSelf().addClass('rating-hover');
+        })
+
+          $(document).delegate('.rating-circle','mouseleave',function() {
+          $(this).prevAll().andSelf().removeClass('rating-hover');
+        })
+
+        $(document).delegate('.rating-circle','click',function() {
+          value = $('.rating-circle').index(this) +1
+          console.log(value)
+          $(this).prevAll().andSelf().addClass('rating-chosen');
+          $(this).nextAll().removeClass('rating-chosen'); 
+          $('#rating-container').prop('disabled',true);
+        })
+        var max_value = 5
+          $(document).delegate('#update-max-value', 'click', function() { 
+            num = $('#max-value').val();
+            max_value = num;
+            console.log(max_value)
+            $('#rating-container').empty();
+            $('#rating-container').append('<div class="rating-circle"></div>');
+
+            $circle = $('.rating-circle').clone();
+
+            $('#rating-container').attr('max-value',num);
+            while (num > 1) {
+              $('#rating-container').append($circle.clone());
+              num = num-1;
+            }
+           });
+          console.log(max_value)
+            $(document).delegate('#save-rating', 'click', function(){
+
+            $.ajax({
+              url : 'http://jquery-edx.azurewebsites.net/api/Rating',
+              type : 'POST',
+              data : {value: value, maxValue: max_value},
+
+              success : function(message) {
+                console.log(message);
+                $('#output').text(message.message);
+              },
+              error : function(xhr,errmsg,err) {
+                console.log('error')
+              }
+            })
+            })
+ </script>
+</body>
+</html>
